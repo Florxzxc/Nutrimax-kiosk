@@ -1,0 +1,276 @@
+html, body {
+  height: 100%;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+.welcome-container {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.welcome-overlay {
+  background: rgba(0, 0, 0, 0.45);
+  border-radius: 24px;
+  padding: 5vw 3vw;
+  text-align: center;
+  max-width: 90vw;
+  box-sizing: border-box;
+}
+
+.welcome-title {
+  color: #fff;
+  font-size: 4vw;
+  font-weight: bold;
+  margin-bottom: 2rem;
+  letter-spacing: 2px;
+  line-height: 1.2;
+}
+
+.welcome-btn {
+  background: #181c36;
+  color: #fff;
+  font-size: 2vw;
+  padding: 0.75em 2em;
+  border: none;
+  border-radius: 16px;
+  box-shadow: 0 6px 0 #b71c1c;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+
+.welcome-btn:active {
+  transform: translateY(2px);
+}
+
+/* --- Choose Page Styles --- */
+.choose-container {
+  background: #8b1818;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2vw;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.choose-back {
+  position: absolute;
+  top: 2vw;
+  left: 2vw;
+  background: transparent;
+  border: none;
+  font-size: 2.5vw;
+  color: #fff;
+  cursor: pointer;
+}
+
+.choose-title {
+  color: #fff;
+  font-size: 2.5vw;
+  font-weight: bold;
+  margin-bottom: 4vw;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.choose-options {
+  display: flex;
+  gap: 4vw;
+  justify-content: center;
+  width: 100%;
+}
+
+.choose-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+}
+
+.choose-icon-frame {
+  border: 6px solid #ffe0c2;
+  border-radius: 18px;
+  padding: 1.5vw;
+  margin-bottom: 1vw;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+}
+
+.choose-icon {
+  width: 7vw;
+  height: 7vw;
+  object-fit: contain;
+}
+
+.choose-label {
+  background: #181c36;
+  color: #fff;
+  font-size: 1.3vw;
+  padding: 0.3em 2em;
+  border-radius: 8px;
+  margin-top: 0.5vw;
+  font-family: 'Montserrat', Arial, sans-serif;
+  font-weight: 600;
+  box-shadow: 0 4px 0 #b71c1c;
+  letter-spacing: 1px;
+}
+
+/* --- Overtime Form Styles --- */
+.overtime-container {
+  background: #8b1818;
+  min-height: 100vh;
+  min-width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 2vw;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.overtime-title {
+  color: #fff;
+  font-size: 2.5vw;
+  font-weight: bold;
+  margin-bottom: 2vw;
+  letter-spacing: 2px;
+  text-align: center;
+}
+
+.overtime-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5vw;
+  width: 90vw;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.overtime-row {
+  display: flex;
+  align-items: center;
+  gap: 1vw;
+  margin-bottom: 1vw;
+}
+
+.overtime-row label {
+  color: #fff;
+  font-size: 1.2vw;
+  min-width: 70px;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.overtime-row input[type="text"],
+.overtime-row input[type="time"] {
+  background: #f5eedc;
+  border: none;
+  border-radius: 6px;
+  padding: 0.5em 1em;
+  font-size: 1.2vw;
+  width: 100%;
+  max-width: 160px;
+  margin-left: 0.5vw;
+  margin-right: 0.5vw;
+  box-shadow: 2px 2px 0 #8882;
+}
+
+.overtime-section-title {
+  color: #fff;
+  font-size: 1.7vw;
+  font-weight: bold;
+  text-align: center;
+  margin: 2vw 0 1vw 0;
+  letter-spacing: 1px;
+}
+
+.overtime-row-inline {
+  justify-content: space-between;
+}
+
+.overtime-submit {
+  margin: 2vw auto 0 auto;
+  background: #181c36;
+  color: #fff;
+  font-size: 1.3vw;
+  padding: 0.7em 2em;
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 4px 0 #b71c1c;
+  cursor: pointer;
+  font-weight: bold;
+  letter-spacing: 1px;
+  display: block;
+}
+
+/* Responsive for mobile */
+@media (max-width: 600px) {
+  .welcome-overlay {
+    padding: 24px 8px;
+  }
+  .welcome-title {
+    font-size: 1.5rem;
+  }
+  .welcome-btn {
+    font-size: 1rem;
+    padding: 0.5em 1.5em;
+  }
+  .choose-title {
+    font-size: 1.2rem;
+  }
+  .choose-icon {
+    width: 60px;
+    height: 60px;
+  }
+  .choose-label {
+    font-size: 1rem;
+    padding: 0.2em 1.2em;
+  }
+  .choose-back {
+    font-size: 2rem;
+    top: 12px;
+    left: 12px;
+  }
+  .choose-options {
+    flex-direction: column;
+    align-items: center;
+  }
+  .overtime-title {
+    font-size: 1.2rem;
+  }
+  .overtime-form {
+    max-width: 98vw;
+    gap: 12px;
+  }
+  .overtime-row label {
+    font-size: 1rem;
+    min-width: 60px;
+  }
+  .overtime-row input[type="text"],
+  .overtime-row input[type="time"] {
+    font-size: 1rem;
+    max-width: 100px;
+  }
+  .overtime-section-title {
+    font-size: 1.1rem;
+  }
+  .overtime-submit {
+    font-size: 1rem;
+    padding: 0.5em 1.2em;
+  }
+}
