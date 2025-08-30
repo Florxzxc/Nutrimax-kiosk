@@ -1,27 +1,36 @@
 import React from "react";
 import { MdAccessTime, MdEventBusy } from "react-icons/md";
+import { FaArrowLeft } from "react-icons/fa"; // better back arrow
+import "../style/global.css";
 
-const Choose = ({ onBack, onOvertime, onLeave }) => (
-  <div className="choose-container">
-    <button className="choose-back" onClick={onBack} aria-label="Back">
-      &#8592;
-    </button>
-    <h2 className="choose-title">PLEASE CHOOSE:</h2>
-    <div className="choose-options">
-      <div className="choose-option" onClick={onOvertime}>
-        <div className="choose-icon-frame">
-          <MdAccessTime className="choose-icon" />
-        </div>
-        <div className="choose-label">Overtime</div>
+const Choose = ({ onBack, onOvertime, onLeave }) => {
+  return (
+    <div className="choose-wrapper">
+      {/* Back Button */}
+      <button className="choose-back" onClick={onBack} aria-label="Back">
+        <FaArrowLeft />
+      </button>
+
+      {/* Header with mascot */}
+      <div className="choose-header">
+        <img src="/pictures/Welcome.png" alt="Mascot" className="choose-mascot" />
+        <h2 className="choose-title">Please Choose</h2>
       </div>
-      <div className="choose-option" onClick={onLeave}>
-        <div className="choose-icon-frame">
-          <MdEventBusy className="choose-icon" />
+
+      {/* Options */}
+      <div className="choose-options">
+        <div className="choose-card overtime" onClick={onOvertime}>
+          <MdAccessTime className="choose-icon" />
+          <h3 className="choose-label">Overtime</h3>
         </div>
-        <div className="choose-label">Leave</div>
+
+        <div className="choose-card leave" onClick={onLeave}>
+          <MdEventBusy className="choose-icon" />
+          <h3 className="choose-label">Leave</h3>
+        </div>
       </div>
     </div>
-  </div>
-);
+  );
+};
 
 export default Choose;
