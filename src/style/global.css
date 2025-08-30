@@ -55,7 +55,7 @@ html, body {
 
 /* --- Choose Page Styles --- */
 .choose-container {
-  background: linear-gradient(135deg, #8B0000 0%, #B22222 30%, #DC143C 70%, #8B0000 100%);
+  background: rgba(33, 24, 141, 0.88);
   min-height: 100vh;
   width: 100%;
   display: flex;
@@ -86,7 +86,7 @@ html, body {
 .choose-wrapper {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #8B0000 0%, #B22222 30%, #DC143C 70%, #8B0000 100%);
+  background: rgba(33, 24, 141, 0.88);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -258,24 +258,12 @@ html, body {
   }
 }
 
-.choose-wrapper {
-  min-height: 100vh;
-  width: 100%;
-  background: #8b1818;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-family: "Poppins", sans-serif;
-  padding: 20px;
-  box-sizing: border-box;
-  position: relative;
-  overflow: hidden;
-}
+
 
 
 /* --- Overtime Form Styles --- */
 .overtime-container {
-  background: #8b1818;
+  background: rgba(33, 24, 141, 0.88);
   min-height: 100vh;
   min-width: 100vw;
   display: flex;
@@ -555,6 +543,7 @@ html, body {
   margin: 0 0 12px 0;
   padding: 0;
   border: none;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.3);
   font-size: 18px;
   font-weight: 600;
 }
@@ -581,7 +570,7 @@ html, body {
 .form-row label {
   min-width: 140px;
   font-weight: 500;
-  color: #5f6368;
+  color: black!important;
   font-size: 14px;
 }
 
@@ -1067,7 +1056,7 @@ html, body {
 .overtime-page {
   min-height: 100vh;
   width: 100%;
-  background: linear-gradient(135deg, #8B0000 0%, #B22222 30%, #DC143C 70%, #8B0000 100%);
+  background: rgba(33, 24, 141, 0.88);
   color: black !important;
   display: flex;
   flex-direction: column;
