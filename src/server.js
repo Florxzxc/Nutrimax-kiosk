@@ -874,69 +874,53 @@ app.post('/api/employees', async (req, res) => {
 });
 
 // 📄 Update Employee
-app.put('/api/employees/:id', async (req, res) => {
-  const employeeId = req.params.id;
-  const emp = req.body;
-  console.log('📝 Updating employee:', employeeId, emp); // Debug log
-  
+app.put("/api/request/:id/:action", async (req, res) => {
+  const { id, action } = req.params;
+
+  console.log("👉 PUT request received:", id, action);
+
+  let newStatus;
+  if (action === "approve") newStatus = "Approved";
+  else if (action === "reject") newStatus = "Disapproved";
+  else return res.status(400).json({ error: "Invalid action" });
+
   try {
-    // Map position/department names to IDs
-    let positionID = null;
-    let departmentID = null;
-    
-    if (emp.position) {
-      const [posResult] = await pool.query('SELECT PositionID FROM jobposition WHERE PositionName = ?', [emp.position]);
-      positionID = posResult.length > 0 ? posResult[0].PositionID : null;
-    }
-    
-    if (emp.department) {
-      const [deptResult] = await pool.query('SELECT DepartmentID FROM department WHERE DepartmentName = ?', [emp.department]);
-      departmentID = deptResult.length > 0 ? deptResult[0].DepartmentID : null;
-    }
-    
-    // Determine BiometricStatus based on biometric enrollment complete checkbox or manual override
-    let biometricStatus;
-    if (emp.biometricStatus) {
-      // Manual override - use the selected biometric status
-      biometricStatus = emp.biometricStatus;
-    } else {
-      // Use biometric enrollment complete checkbox
-      biometricStatus = emp.BiometricStatus || 'Not Enrolled';
-    }
-    
-    // Update employee data
-    const [result] = await pool.query(`
-      UPDATE employee 
-      SET FirstName = ?, MiddleName = ?, LastName = ?, Gender = ?, 
-          PositionID = ?, DepartmentID = ?, ContactNumber = ?, Email = ?, 
-          BiometricStatus = ?, Status = ?, Finger1 = ?, Finger2 = ?
-      WHERE EmployeeID = ?
-    `, [
-      emp.firstName || emp.FirstName || '',
-      emp.middleName || emp.MiddleName || '',
-      emp.lastName || emp.LastName || '',
-      emp.gender,
-      positionID,
-      departmentID,
-      emp.contact,
-      emp.email,
-      biometricStatus,
-      emp.status,
-      emp.Finger1 ? 1 : 0,  // Convert boolean to int
-      emp.Finger2 ? 1 : 0,  // Convert boolean to int
-      employeeId
-    ]);
-    
+    // 1. Update main request
+    const [result] = await pool.query(
+      "UPDATE request SET Status = ?, DateApproved = NOW() WHERE RequestID = ?",
+      [newStatus, id]
+    );
+
     if (result.affectedRows === 0) {
-      return res.status(404).json({ error: 'Employee not found' });
+      return res.status(404).json({ error: "Request not found" });
     }
-    
-    console.log('✅ Employee updated successfully'); // Debug log
-    res.json({ success: true, message: 'Employee updated successfully' });
+
+    // 2. Check type of request and update accordingly
+    const [reqRow] = await pool.query(
+      "SELECT RequestType FROM request WHERE RequestID = ?",
+      [id]
+    );
+
+    if (reqRow.length > 0) {
+      if (reqRow[0].RequestType === "Overtime") {
+        // Update overtime table (assuming it has Status column)
+        await pool.query(
+          "UPDATE `overtime` SET `Status` = ? WHERE `RequestID` = ?",
+          [newStatus, id]
+        );
+      }
+      // Remove the leave table update since it doesn't have Status column
+      // The main request table already tracks the status
+    }
+
+    res.json({
+      message: `Request ${newStatus.toLowerCase()} successfully`,
+      status: newStatus,
+      dateApproved: new Date().toISOString()
+    });
   } catch (err) {
-    console.error('❌ Error updating employee:', err.message);
-    console.error('❌ Full error details:', err); // More detailed error logging
-    res.status(500).json({ error: 'Failed to update employee', details: err.message });
+    console.error("❌ SQL Error:", err.sqlMessage || err.message);
+    res.status(500).json({ error: err.sqlMessage || "Failed to update request" });
   }
 });
 
@@ -973,18 +957,53 @@ app.get("/api/attendance", async (req, res) => {
 
 
 
-// 📄 Get Requests
+
+// 📄 Get Requests with Leave/Overtime details
 app.get('/api/request', async (req, res) => {
   try {
     const [rows] = await pool.query(`
-      SELECT * FROM request ORDER BY DateApplied DESC
+      SELECT 
+        r.RequestID,
+        r.EmployeeName,
+        r.Supervisor,
+        r.Department,
+        r.RequestType,
+        r.Status,
+        r.DateApplied,
+        r.DateApproved,
+        l.Reason AS LeaveReason,
+        DATEDIFF(l.EndDate, l.StartDate) + 1 AS LeaveDays,
+        o.OvertimeReason,
+        o.OvertimeHours
+      FROM request r
+      LEFT JOIN \`leave\` l ON l.RequestID = r.RequestID
+      LEFT JOIN overtime o ON o.RequestID = r.RequestID
+      ORDER BY r.DateApplied DESC
     `);
-    res.json(rows);
+
+    // Normalize into frontend-friendly format
+    const formatted = rows.map(row => ({
+      RequestID: row.RequestID,
+      EmployeeName: row.EmployeeName,
+      Supervisor: row.Supervisor,
+      Department: row.Department,
+      RequestType: row.RequestType,
+      Status: row.Status,
+      DateApplied: row.DateApplied,
+      DateApproved: row.DateApproved,
+      Reason: row.RequestType === 'Leave' ? row.LeaveReason : row.OvertimeReason,
+      Days: row.RequestType === 'Leave' ? row.LeaveDays : null,
+      Hours: row.RequestType === 'Overtime' ? row.OvertimeHours : null
+    }));
+
+    res.json(formatted);
   } catch (err) {
-    console.error('❌ Error fetching requests:', err.message);
-    res.status(500).json({ error: 'Failed to retrieve requests' });
+    console.error('❌ Error fetching requests:', err.sqlMessage || err.message);
+    res.status(500).json({ error: 'Failed to fetch requests' });
   }
 });
+
+
 
 // 📄 Get Overtime Requests (joined details for HR)
 app.get('/api/request/overtime', async (req, res) => {
@@ -1020,6 +1039,63 @@ app.get('/api/request/overtime', async (req, res) => {
     res.status(500).json({ error: 'Failed to retrieve overtime requests' });
   }
 });
+
+
+app.put("/api/request/:id/:action", async (req, res) => {
+  const { id, action } = req.params;
+
+  console.log("👉 PUT request received:", id, action);
+
+  let newStatus;
+  if (action === "approve") newStatus = "Approved";
+  else if (action === "reject") newStatus = "Disapproved";
+  else return res.status(400).json({ error: "Invalid action" });
+
+  try {
+    // 1. Update main request
+    const [result] = await pool.query(
+      "UPDATE request SET Status = ?, DateApproved = NOW() WHERE RequestID = ?",
+      [newStatus, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: "Request not found" });
+    }
+
+    // 2. Check type of request
+    const [reqRow] = await pool.query(
+      "SELECT RequestType FROM request WHERE RequestID = ?",
+      [id]
+    );
+
+    if (reqRow.length > 0) {
+      if (reqRow[0].RequestType === "Overtime") {
+        await pool.query(
+          "UPDATE `overtime` SET `Status` = ? WHERE `RequestID` = ?",
+          [newStatus, id]
+        );
+      } else if (reqRow[0].RequestType === "Leave") {
+        await pool.query(
+          "UPDATE `leave` SET `Status` = ? WHERE `RequestID` = ?",
+          [newStatus, id]
+        );
+      }      
+    }
+
+    res.json({
+      message: `Request ${newStatus.toLowerCase()} successfully`,
+      status: newStatus,
+      dateApproved: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error("❌ SQL Error:", err.sqlMessage || err.message);
+    res.status(500).json({ error: err.sqlMessage || "Failed to update request" });
+  }
+});
+
+
+
+
 
 // 📄 Create Overtime Request (used by kiosk UI after biometric verification)
 app.post('/api/request/overtime', async (req, res) => {
